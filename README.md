@@ -5,7 +5,7 @@ Obtenha o fornecedor de um endereço mac no terminal.
 # sudo mkdir /opt/macvendor 
 # sudo chown $USER /opt/macvendor -R 
 # wget https://gitlab.com/wireshark/wireshark/-/raw/master/manuf -O /opt/macvendor/macvendor.db
-# wget https://raw.githubusercontent.com/remontti/macvendor/main/macvendor -O /bin/macvendor
+# wget https://raw.githubusercontent.com/remontti/macvendor/main/macvendor -O /opt/macvendor/macvendor
 # chmod +x /opt/macvendor/macvendor
 # sudo ln -s /opt/macvendor/macvendor /bin/macvendor
 # 
