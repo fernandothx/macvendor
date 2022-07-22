@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+# macvendor - Obtenha o fornecedor de um endereço mac no terminal.
+#
+# apt install ieee-data
+#
+
+# Definir funções
+usage()
+{
+  echo "MAC Vendor Ajuda"
+  echo "macvendor -a 'ENDEREÇO MAC' | OBTENHA O FORNECEDOR DO ENDEREÇO ESPECIFICADO."
+  echo "macvendor -s 'ENDEREÇO MAC' | SILENCIOSO, APENAS O RESULTADO DE SAÍDA."
+  exit 0
+}
+
+get_database()
+{
+  database="$(cat /var/lib/ieee-data/oui*.txt)"
+}
+
+format_vendor_address()
+{
+  [[ -n $1 ]] && vendor_address="$1"
+  
+  vendor_address="$(echo "$vendor_address" | tr -d ':' | tr '[:lower:]' '[:upper:]')"
+  if [[ ${#vendor_address} == "6" ]]; then
+    return
+  else
+    vendor_address="$(echo "$vendor_address" | cut -c1-6)"
+  fi
+}
+
+# Definir argumentos
+while getopts ":s:a:h" opt; do
+  case $opt in
+    s )  silent=true; vendor_address="$OPTARG" ;;
+    a )  vendor_address="$OPTARG" ;;
+    h )  usage ;;
+    \?)  echo "[ERRO] OPÇÃO INVÁLIDA: -$OPTARG" ; exit 1 ;;
+  esac
+done
+
+# Obter endereço do fornecedor
+[[ -z $vendor_address && -n $1 ]] && vendor_address="$1"
+[[ -z $vendor_address ]] && read -p "ENDEREÇO MAC PARA TESTAR [XX:XX:XX:XX:XX:XX]: " vendor_address
+format_vendor_address
+[[ ${#vendor_address} < 6 || ! $vendor_address =~ ^[0-9A-F]{6}$ ]] \
+  && echo "[ERROR Linha $LINENO] O ENDEREÇO '$vendor_address' É INVÁLIDO." && exit 65
+
+# Imprimir resultado
+[[ $silent != true ]]
+get_database
+vendor="$(echo "$database" | grep -E "$vendor_address.*(base 16)" | awk '{for(i=4;i<NF;i++) printf"%s",$i OFS;if(NF)printf"%s",$NF;printf ORS}')"
+[[ -z $vendor ]] && vendor="DESCONHECIDO"
+
+[[ $silent != true ]] && echo -n "O PREFIXO DO ENDEREÇO MAC "
+echo -n "[$vendor_address] "
+[[ $silent != true ]] && echo -n "PERTENCE A: "
+echo "$vendor"
+
+exit 0
