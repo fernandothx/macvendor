@@ -22,7 +22,7 @@ usage()
 
 get_database()
 {
-  database="$(cat /home/remontti/Downloads/manuf.txt)"
+  database="$(cat /opt/macvendor/macvendor.db)"
 }
 
 format_vendor_address()
