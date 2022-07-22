@@ -8,6 +8,7 @@ Obtenha o fornecedor de um endereço mac no terminal.
 # wget https://raw.githubusercontent.com/remontti/macvendor/main/macvendor -O /opt/macvendor/macvendor
 # chmod +x /opt/macvendor/macvendor
 # sudo ln -s /opt/macvendor/macvendor /bin/macvendor
+# sudo chown $USER /bin/macvendor
 # 
 ```
 ### Uso
