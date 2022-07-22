@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# macvendor - Obtenha o fornecedor de um endereço mac no terminal.
+#
+# sudo mkdir /opt/macvendor 
+# sudo chown $USER /opt/macvendor -R 
+# wget https://gitlab.com/wireshark/wireshark/-/raw/master/manuf -O /opt/macvendor/macvendor.db
+# wget https://raw.githubusercontent.com/remontti/macvendor/main/macvendor -O /bin/macvendor
+# chmod +x /opt/macvendor/macvendor
+# sudo ln -s /opt/macvendor/macvendor /bin/macvendor
+#
+#
+
+# Definir funções
+usage()
+{
+  echo "MAC Vendor Ajuda"
+  echo "macvendor 'Endereço MAC'"
+  echo "macvendor -s 'Endereço MAC'"
+  exit 0
+}
+
+get_database()
+{
+  database="$(cat /home/remontti/Downloads/manuf.txt)"
+}
+
+format_vendor_address()
+{
+  [[ -n $1 ]] && vendor_address="$1"
+  
+  vendor_address="$(echo "$vendor_address" | tr '[:lower:]' '[:upper:]')"
+  if [[ ${#vendor_address} == "8" ]]; then
+    return
+  else
+  	vendor_address_full="$(echo "$vendor_address" | cut -c1-17)"
+    vendor_address="$(echo "$vendor_address" | cut -c1-8)"    
+  fi
+}
+
+# Definir argumentos
+while getopts ":s:a:h" opt; do
+  case $opt in
+    s )  silent=true; vendor_address="$OPTARG" ;;
+    a )  vendor_address="$OPTARG" ;;
+    h )  usage ;;
+    \?)  echo "[ERRO] OPÇÃO INVÁLIDA: -$OPTARG" ; exit 1 ;;
+  esac
+done
+
+# Obter endereço do fornecedor
+[[ -z $vendor_address && -n $1 ]] && vendor_address="$1"
+[[ -z $vendor_address ]] && read -p "Endereço MAC [##:##:##:##:##:##]: " vendor_address
+format_vendor_address
+[[ ${#vendor_address_full} < 17 || ! $vendor_address_full =~ ^([[:xdigit:]]{2}[:.-]?){5}[[:xdigit:]]{2}$ ]] && echo "O MAC '$vendor_address' é inválido." && exit 65
+
+# Imprimir resultado
+[[ $silent != true ]]
+get_database
+vendor="$(echo "$database" | grep -E "$vendor_address" | awk '{for(i=3;i<NF;i++) printf"%s",$i OFS;if(NF)printf"%s",$NF;printf ORS}' )"
+[[ -z $vendor ]] && vendor="DESCONHECIDO"
+
+[[ $silent != true ]] && echo -n "MAC: $vendor_address_full >> "
+echo "$vendor"
+
+exit 0 
