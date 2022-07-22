@@ -3,7 +3,7 @@ Obtenha o fornecedor de um endereço mac no terminal.
 
 ```
 # apt install ieee-data
-# wget https://raw.githubusercontent.com/remontti/macvendor/main/macvendor -O /bin/macvendor_v1
+# wget https://raw.githubusercontent.com/remontti/macvendor/main/macvendor_v1 -O /bin/macvendor_v1
 # chmod +x /bin/macvendor
 ```
 
